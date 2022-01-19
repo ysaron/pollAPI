@@ -1,0 +1,10 @@
+.idea/
+__pycache__/
+
+migrations
+
+db.sqlite3
+db.sqlite3-journal
+
+venv/
+.env
