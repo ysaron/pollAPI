@@ -6,7 +6,7 @@ from .serializers import PollListSerializer, PollDetailSerializer, AnswerCreateS
 
 
 class PollListView(generics.ListAPIView):
-    """ Вывод списка активных опросов """
+    """ Listing active polls """
 
     serializer_class = PollListSerializer
 
@@ -15,7 +15,7 @@ class PollListView(generics.ListAPIView):
 
 
 class PollDetailView(generics.RetrieveAPIView):
-    """ Вывод опроса со всеми связанными вопросами """
+    """ Show the poll with all related questions """
 
     serializer_class = PollDetailSerializer
 
@@ -24,7 +24,7 @@ class PollDetailView(generics.RetrieveAPIView):
 
 
 class AnswerCreateView(generics.CreateAPIView):
-    """ Предоставление ответа """
+    """ Providing an answer """
     serializer_class = AnswerCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -33,11 +33,14 @@ class AnswerCreateView(generics.CreateAPIView):
 
 
 class MyPollsListView(generics.ListAPIView):
+    """ Displaying a report on the polls completed by the current user """
+
     serializer_class = MyPollsListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = Poll.objects.active().annotate(
+        # Getting polls where all questions have answers given by the current user
+        qs = Poll.objects.annotate(
             num_questions=Count('question'),
             num_user_answers=Count('question__answer', filter=Q(question__answer__user=self.request.user)),
         ).filter(
@@ -48,6 +51,7 @@ class MyPollsListView(generics.ListAPIView):
         return qs
 
     def get_serializer_context(self):
+        """ Passing request to the serializer """
         context = super().get_serializer_context()
         context.update({"request": self.request})
         return context

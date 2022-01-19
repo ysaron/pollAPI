@@ -19,7 +19,7 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-Создать файл `.env` и задать в нем переменную `TOKEN`
+Создать файл `.env` и задать в нем переменную `TOKEN`.
 
 Создать и применить миграции
 ```shell
@@ -70,7 +70,7 @@ curl -X POST http://127.0.0.1:8000/auth/token/login/ --data "username=user01&pas
   ```shell
   curl -X GET http://127.0.0.1:8000/api/v1/active_polls/
   ```
-- **GET /active_polls/<id>**  
+- **GET /active_polls/\<id\>/**  
   Получение опроса по ID со всеми его вопросами  
   ```shell
   curl -X GET http://127.0.0.1:8000/api/v1/active_polls/2/

@@ -7,6 +7,7 @@ from django.utils.timezone import now
 class PollManager(models.Manager):
 
     def active(self):
+        """ Returns queryset of polls ready to be run """
         return super().get_queryset().filter(start_date__lt=now(), end_date__gt=now(), is_ready=True)
 
 
@@ -16,7 +17,8 @@ class Poll(models.Model):
     start_date = models.DateTimeField(verbose_name='Beginning date')
     end_date = models.DateTimeField(verbose_name='Expiration date')
     description = models.TextField(verbose_name='Description')
-    is_ready = models.BooleanField(default=False, verbose_name='Ready')
+    is_ready = models.BooleanField(default=False, verbose_name='Ready',
+                                   help_text='Set True after creating all related questions')
 
     objects = PollManager()
 
@@ -88,6 +90,7 @@ class Answer(models.Model):
         return f'{self.user} | {self.question.text} | {self.option}'
 
     def display_option(self):
+        """ Returns a string to display the M2M field """
         return ' | '.join([f'Option №{opt.number}: {opt.text}' for opt in self.option.all()])
 
     display_option.short_description = 'Answers'

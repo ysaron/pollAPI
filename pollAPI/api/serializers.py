@@ -23,7 +23,6 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class PollListSerializer(serializers.ModelSerializer):
-    """ Список опросов """
 
     start_date = serializers.DateTimeField(format='%d.%m.%Y %H:%M:%S')
     end_date = serializers.DateTimeField(format='%d.%m.%Y %H:%M:%S')
@@ -34,9 +33,9 @@ class PollListSerializer(serializers.ModelSerializer):
 
 
 class PollDetailSerializer(serializers.ModelSerializer):
+
     start_date = serializers.DateTimeField(format='%d.%m.%Y %H:%M:%S')
     end_date = serializers.DateTimeField(format='%d.%m.%Y %H:%M:%S')
-
     questions = QuestionSerializer(source='question_set', many=True)
 
     class Meta:
@@ -53,15 +52,22 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
         fields = ('question', 'option', 'text')
 
     def validate(self, data):
+
         if data['question'].poll not in Poll.objects.active():
             raise ValidationError('The poll is unavailable')
+
         question_type = data['question'].question_type
         text = data.get('text')
         options = data.get('option')
+
         if not any([text, options]):
             raise ValidationError('No answer was given')
+
+        # Validate text answers
         if question_type == 'T' and not data.get('text'):
             raise ValidationError('The answer to this type of question must contain "text"')
+
+        # Validate answers to questions with choices
         if question_type != 'T':
             if not data.get('option'):
                 raise ValidationError('The answer to this type of question must contain "options"')
@@ -69,6 +75,8 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
                 raise ValidationError('Options must be a comma-separated string with option id')
             if question_type == 'OC' and not re.match(r'^\d+$', options):
                 raise ValidationError('The answer to this type of question must be a number (option id)')
+
+            # Make sure that the answer provided options from this question
             option_ids = list(map(int, data['option'].split(',')))
             option_objects = Option.objects.filter(pk__in=option_ids)
             if any(opt.question != data['question'] for opt in option_objects):
@@ -78,6 +86,7 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if validated_data.get('option'):
+            # parse comma-separated IDs
             option_ids = list(map(int, validated_data['option'].split(',')))
             answer_data = {key: value for key, value in validated_data.items() if key not in ['option', 'text']}
             option_objects = Option.objects.filter(pk__in=option_ids)
@@ -91,6 +100,7 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
 
 
 class QuestionReportSerializer(QuestionSerializer):
+    """ Serializer of the question displayed in the /my_polls/ report """
 
     answer = serializers.SerializerMethodField()
 
