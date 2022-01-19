@@ -50,4 +50,5 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = ('user', 'question', 'display_option', 'text')
     list_filter = ('user',)
     search_fields = ('user', 'question')
+    fields = ('user', 'question', 'display_option', 'text')
     readonly_fields = ('user', 'question', 'display_option', 'text')
