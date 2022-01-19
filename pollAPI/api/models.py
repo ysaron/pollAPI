@@ -76,7 +76,7 @@ class Answer(models.Model):
 
     user: User = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Participant', null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Question')
-    option: Option = models.ManyToManyField(Option, verbose_name='Selected option(s)', null=True)
+    option: Option = models.ManyToManyField(Option, verbose_name='Selected option(s)')
     text = models.TextField(verbose_name='Text answer', default='')
 
     class Meta:
